@@ -13,26 +13,27 @@
   "keywords": [],
   "scripts": {
     "start": "node ./build/server.js",
-    "build": "webpack"
+    "build": "webpack",
+    "start:dev": "webpack&&node -r dotenv/config ./build/server.js"
   },
   "private": true,
   "bugs": {
     "url": "https://github.com/ferisef/moosikapp-cdn/issues"
   },
   "dependencies": {
-    "yadisk-mgr": "C:\\Users\\ferisef\\Packages\\yadisk-mgr"
+    "express": "^4.17.1",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4",
+    "yadisk-mgr": "https://github.com/Ferisef/yadisk-mgr"
   },
   "devDependencies": {
     "@babel/core": "^7.5.4",
     "@babel/preset-env": "^7.5.4",
     "babel-loader": "^8.0.6",
     "dotenv": "^8.0.0",
-    "eslint": "^6.0.1",
-    "eslint-config-standard": "^13.0.1",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.2.0",
     "eslint-plugin-import": "^2.18.0",
-    "eslint-plugin-node": "^9.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.0",
     "webpack": "^4.35.3",
     "webpack-cli": "^3.3.5",
     "webpack-node-externals": "^1.7.2"
