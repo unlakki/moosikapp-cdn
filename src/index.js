@@ -19,6 +19,14 @@ const app = Express();
 app.disable('x-powered-by');
 app.disable('etag');
 
+app.use((err, erq, res, next) => {
+  if (!err) {
+    next();
+  }
+
+  res.status(500).send(err);
+});
+
 app.get('/v1/*', async (req, res) => {
   const { path } = req;
 
