@@ -4,7 +4,7 @@
   "description": "MoosikApp CDN",
   "author": "Hibikaze",
   "license": "MIT",
-  "main": "./src/index.js",
+  "main": "./build/server.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/ferisef/moosikapp-cdn"
@@ -13,7 +13,8 @@
   "keywords": [],
   "scripts": {
     "start": "node ./build/server.js",
-    "build": "webpack"
+    "build": "webpack",
+    "start:dev": "webpack&&node -r dotenv/config ./build/server.js"
   },
   "private": true,
   "bugs": {
