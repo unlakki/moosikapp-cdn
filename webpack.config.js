@@ -3,13 +3,8 @@
 const path = require('path');
 const webpack = require('webpack');
 const webpackNodeExternals = require('webpack-node-externals');
-const dotenv = require('dotenv');
 
 const prod = process.env.NODE_ENV === 'production';
-
-if (!prod) {
-  dotenv.config();
-}
 
 module.exports = {
   target: 'node',
