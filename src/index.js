@@ -75,9 +75,6 @@ app.put('/v1/upload/:token', async (req, res) => {
 
     res.status(201).send(path);
   } catch (e) {
-    res.status(500).send();
-    return;
-
     switch (e.statusCode) {
       case 404:
         res.status(410).send();
