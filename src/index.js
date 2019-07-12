@@ -3,6 +3,7 @@ import Path from 'path';
 import { Buffer } from 'buffer';
 import { DiskManager } from 'yadisk-mgr';
 import Express from 'express';
+import cors from 'cors';
 import request from 'request-promise';
 import { exists, unlink, createCache } from './utils';
 
@@ -18,6 +19,8 @@ const app = Express();
 
 app.disable('x-powered-by');
 app.disable('etag');
+
+app.use(cors());
 
 app.use((err, req, res, next) => {
   if (!err) {
