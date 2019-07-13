@@ -50,11 +50,11 @@ app.put('/v1/upload-target/:target', async (req, res) => {
     res.status(201).send(path);
   } catch (e) {
     switch (e.statusCode) {
-      case 404:
+      case 400:
         res.status(410).send();
         break;
       default:
-        res.status(400).send();
+        res.status(400).send(e.message);
     }
   }
 });
