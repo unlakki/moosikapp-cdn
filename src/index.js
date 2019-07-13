@@ -39,7 +39,7 @@ app.get('/v1/*', async (req, res) => {
 
 app.put('/v1/upload-target/:target', async (req, res) => {
   const { target } = req.params;
-  const [uuid, dext] = target.split('_');
+  const [uuid, dext] = target.split('.');
 
   try {
     await request(`${VERIFICATION_SERVER}?uuid=${uuid}`);
