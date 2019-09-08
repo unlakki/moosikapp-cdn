@@ -1,4 +1,4 @@
-/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable */
 
 const path = require('path');
 const webpack = require('webpack');
@@ -8,21 +8,27 @@ const prod = process.env.NODE_ENV === 'production';
 
 module.exports = {
   target: 'node',
-  entry: './src/index.js',
+  entry: './src/index.ts',
   mode: prod ? 'production' : 'development',
   output: {
     path: path.resolve('./build'),
     filename: 'server.js',
   },
+  node: {
+    __dirname: true,
+  },
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.ts$/,
         use: {
-          loader: 'babel-loader',
+          loader: 'ts-loader',
         },
       },
     ],
+  },
+  resolve: {
+    extensions: ['.ts', '.js'],
   },
   externals: [
     webpackNodeExternals(),
