@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer';
-import { DiskManager } from 'yadisk-mgr';
-import Express from 'express';
+import DiskManager from 'yadisk-mgr';
+import Express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import request from 'request-promise';
 
@@ -8,7 +8,12 @@ const {
   PORT, VERIFICATION_SERVER, TOKENS,
 } = process.env;
 
-const mgr = new DiskManager(JSON.parse(TOKENS));
+if (!TOKENS) {
+  console.warn('No tokens found.');
+  process.exit(1);
+}
+
+const diskManager = new DiskManager(JSON.parse(TOKENS as string));
 
 const app = Express();
 
@@ -17,7 +22,7 @@ app.disable('etag');
 
 app.use(cors());
 
-app.use((err, req, res, next) => {
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   if (!err) {
     next();
   }
@@ -25,11 +30,11 @@ app.use((err, req, res, next) => {
   res.status(500).send();
 });
 
-app.get('/v1/*', async (req, res) => {
+app.get('/v1/*', async (req: Request, res: Response) => {
   const { path } = req;
 
   try {
-    const uri = await mgr.getFileLink(path.slice(3));
+    const uri = await diskManager.getFileLink(path.slice(3));
 
     request(uri).pipe(res);
   } catch (e) {
@@ -45,7 +50,7 @@ app.put('/v1/upload-target/:target', async (req, res) => {
     await request(`${VERIFICATION_SERVER}?uuid=${uuid}`);
 
     const ext = Buffer.from(dext, 'hex').toString('utf8');
-    const { path } = await mgr.uploadFile(req, ext);
+    const { path } = await diskManager.uploadFile(req, ext);
 
     res.status(201).send(path);
   } catch (e) {
@@ -63,4 +68,4 @@ app.all('*', (req, res) => {
   res.status(403).send();
 });
 
-app.listen(PORT || 8080);
+app.listen(PORT);
