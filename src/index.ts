@@ -1,25 +1,28 @@
-import { Buffer } from 'buffer';
 import DiskManager from 'yadisk-mgr';
-import Express, { Request, Response, NextFunction } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
+import helmet from 'helmet';
 import cors from 'cors';
 import request from 'request-promise';
+import getExtension from './utils/getExtension';
+
+const VERSION = 2;
 
 const {
-  PORT, VERIFICATION_SERVER, TOKENS,
+  PORT, VERIFICATION_SERVER, TOKEN_LIST,
 } = process.env;
 
-if (!TOKENS) {
-  console.warn('No tokens found.');
-  process.exit(1);
+if (!TOKEN_LIST) {
+  console.error('No token list provided.');
+  process.exit();
 }
 
-const diskManager = new DiskManager(JSON.parse(TOKENS as string));
+const diskManager = new DiskManager(JSON.parse(TOKEN_LIST as string));
 
-const app = Express();
+const app = express();
 
-app.disable('x-powered-by');
-app.disable('etag');
-
+app.use(helmet({
+  hsts: false,
+}));
 app.use(cors());
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -30,11 +33,11 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).send();
 });
 
-app.get('/v1/*', async (req: Request, res: Response) => {
+app.get(`/v${VERSION}/*`, async (req: Request, res: Response) => {
   const { path } = req;
 
   try {
-    const uri = await diskManager.getFileLink(path.slice(3));
+    const uri = await diskManager.getFileLink(path.slice(path.indexOf('/', 1)));
 
     request(uri).pipe(res);
   } catch (e) {
@@ -42,25 +45,41 @@ app.get('/v1/*', async (req: Request, res: Response) => {
   }
 });
 
-app.put('/v1/upload-target/:target', async (req, res) => {
-  const { target } = req.params;
-  const [uuid, dext] = target.split('.');
+app.put(`/v${VERSION}/upload-target/:uuid`, async (req, res) => {
+  const {
+    params: {
+      uuid,
+    },
+    headers,
+  } = req;
 
   try {
     await request(`${VERIFICATION_SERVER}?uuid=${uuid}`);
 
-    const ext = Buffer.from(dext, 'hex').toString('utf8');
-    const { path } = await diskManager.uploadFile(req, ext);
+    const contentType = headers['content-type'];
+    if (!contentType) {
+      throw new Error('No `Content-Type` header provided.');
+    }
+
+    const extension = getExtension(contentType);
+    const { path } = await diskManager.uploadFile(req, extension);
 
     res.status(201).send(path);
   } catch (e) {
-    switch (e.statusCode) {
-      case 400:
-        res.status(410).send();
+    if (e.statusCode) {
+      res.status(410).send();
+      return;
+    }
+
+    switch (e.message) {
+      case 'E_INCORRENT_CONTENT_TYPE':
+        res.status(415).send('Incorrect `Content-Type` header provided.');
         break;
       default:
         res.status(400).send(e.message);
     }
+
+    res.status(400).send(e.message);
   }
 });
 
