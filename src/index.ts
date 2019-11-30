@@ -5,7 +5,7 @@ import cors from 'cors';
 import request from 'request-promise';
 import getExtension from './utils/getExtension';
 
-const VERSION = 2;
+const VERSION = 1;
 
 const {
   PORT, VERIFICATION_SERVER, TOKEN_LIST,
@@ -16,22 +16,12 @@ if (!TOKEN_LIST) {
   process.exit();
 }
 
-const diskManager = new DiskManager(JSON.parse(TOKEN_LIST as string));
+const diskManager = new DiskManager(JSON.parse(String(TOKEN_LIST)));
 
 const app = express();
 
-app.use(helmet({
-  hsts: false,
-}));
+app.use(helmet({ hsts: false }));
 app.use(cors());
-
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  if (!err) {
-    next();
-  }
-
-  res.status(500).send();
-});
 
 app.get(`/v${VERSION}/*`, async (req: Request, res: Response) => {
   const { path } = req;
@@ -85,6 +75,14 @@ app.put(`/v${VERSION}/upload-target/:uuid`, async (req, res) => {
 
 app.all('*', (req, res) => {
   res.status(403).send();
+});
+
+app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+  if (!error) {
+    next();
+  }
+
+  res.status(500).send();
 });
 
 app.listen(PORT);
