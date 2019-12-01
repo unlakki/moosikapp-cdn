@@ -5,10 +5,8 @@ import cors from 'cors';
 import request from 'request-promise';
 import getExtension from './utils/getExtension';
 
-const VERSION = 1;
-
 const {
-  PORT, VERIFICATION_SERVER, TOKEN_LIST,
+  PORT, TOKEN_LIST, VERSION, VERIFICATION_SERVER,
 } = process.env;
 
 if (!TOKEN_LIST) {
