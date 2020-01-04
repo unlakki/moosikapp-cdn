@@ -6,9 +6,7 @@ import JWT, { JsonWebTokenError } from 'jsonwebtoken';
 import request from 'request-promise';
 import getExtension, { InvalidExtensionError } from './utils/extensions';
 
-const {
-  PORT, TOKEN_LIST, JWT_SECRET,
-} = process.env;
+const { PORT, TOKEN_LIST, JWT_SECRET } = process.env;
 
 const diskManager = new DiskManager(JSON.parse(String(TOKEN_LIST)));
 
