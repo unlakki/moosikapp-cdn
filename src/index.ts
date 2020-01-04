@@ -2,17 +2,13 @@ import DiskManager from 'yadisk-mgr';
 import express, { Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
+import JWT, { JsonWebTokenError } from 'jsonwebtoken';
 import request from 'request-promise';
-import getExtension from './utils/getExtension';
+import getExtension, { InvalidExtensionError } from './utils/extensions';
 
 const {
-  PORT, TOKEN_LIST, VERSION, VERIFICATION_SERVER,
+  PORT, TOKEN_LIST, JWT_SECRET,
 } = process.env;
-
-if (!TOKEN_LIST) {
-  console.error('No token list provided.');
-  process.exit();
-}
 
 const diskManager = new DiskManager(JSON.parse(String(TOKEN_LIST)));
 
@@ -21,11 +17,9 @@ const app = express();
 app.use(helmet({ hsts: false }));
 app.use(cors());
 
-app.get(`/v${VERSION}/*`, async (req: Request, res: Response) => {
-  const { path } = req;
-
+app.get('*', async (req: Request, res: Response) => {
   try {
-    const uri = await diskManager.getFileLink(path.slice(path.indexOf('/', 1)));
+    const uri = await diskManager.getFileLink(req.path);
 
     request(uri).pipe(res);
   } catch (e) {
@@ -33,46 +27,33 @@ app.get(`/v${VERSION}/*`, async (req: Request, res: Response) => {
   }
 });
 
-app.put(`/v${VERSION}/upload-target/:uuid`, async (req, res) => {
-  const {
-    params: {
-      uuid,
-    },
-    headers,
-  } = req;
+app.put('/upload-target/:target', async (req, res) => {
+  const { 'content-type': contentType } = req.headers;
 
   try {
-    await request(`${VERIFICATION_SERVER}?uuid=${uuid}`);
-
-    const contentType = headers['content-type'];
     if (!contentType) {
       throw new Error('No `Content-Type` header provided.');
     }
+
+    JWT.verify(req.params.target, String(JWT_SECRET));
 
     const extension = getExtension(contentType);
     const { path } = await diskManager.uploadFile(req, extension);
 
     res.status(201).send(path);
   } catch (e) {
-    if (e.statusCode) {
+    if (e instanceof JsonWebTokenError) {
       res.status(410).send();
       return;
     }
 
-    switch (e.message) {
-      case 'E_INCORRENT_CONTENT_TYPE':
-        res.status(415).send('Incorrect `Content-Type` header provided.');
-        break;
-      default:
-        res.status(400).send(e.message);
+    if (e instanceof InvalidExtensionError) {
+      res.status(415).send('Incorrect `Content-Type` header provided.');
+      return;
     }
 
     res.status(400).send(e.message);
   }
-});
-
-app.all('*', (req, res) => {
-  res.status(403).send();
 });
 
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
@@ -83,4 +64,4 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).send();
 });
 
-app.listen(PORT);
+app.listen(Number(PORT));
