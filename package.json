@@ -1,8 +1,8 @@
 {
   "name": "moosikapp-cdn",
   "version": "3.1.8",
-  "description": "MoosikApp CDN",
-  "author": "Hibikaze",
+  "description": "MoosikApp file storage.",
+  "author": "Uwufule",
   "license": "MIT",
   "main": "dist/server.js",
   "repository": {
