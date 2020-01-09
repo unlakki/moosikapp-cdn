@@ -4,7 +4,7 @@ export interface JWTToken {
   exp: number;
 }
 
-interface TokenManagerParams {
+interface TokenManagerOptions {
   period: number;
 }
 
@@ -15,8 +15,8 @@ export default class {
 
   private timer: NodeJS.Timeout;
 
-  constructor({ period }: TokenManagerParams) {
-    this.period = period;
+  constructor(options: TokenManagerOptions) {
+    this.period = options.period;
     this.start();
   }
 
