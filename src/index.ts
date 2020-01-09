@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import JWT, { JsonWebTokenError } from 'jsonwebtoken';
 import request from 'request-promise';
-import parseExtension, { ExtensionParseError } from './utils/ExtensionParser';
+import parseExtension, { ExtensionParserError } from './utils/ExtensionParser';
 import HTTPError from './errors/HTTPError';
 import TokenManager, { JWTToken } from './utils/TokenManager';
 
@@ -56,7 +56,7 @@ app.put('/upload-target/:target', async (req: Request, res: Response) => {
       return;
     }
 
-    if (e instanceof ExtensionParseError) {
+    if (e instanceof ExtensionParserError) {
       res.status(415).send('Incorrect `Content-Type` header provided.');
       return;
     }

@@ -1,9 +1,9 @@
-export class ExtensionParseError extends Error {
+export class ExtensionParserError extends Error {
   readonly name: string;
 
   constructor(message: string) {
     super(message);
-    this.name = 'ExtensionParseError';
+    this.name = 'ExtensionParserError';
   }
 }
 
@@ -21,6 +21,6 @@ export default (contentType: string): string => {
     case 'webp':
       return type;
     default:
-      throw new ExtensionParseError('Invalid extension.');
+      throw new ExtensionParserError('Invalid extension.');
   }
 };
