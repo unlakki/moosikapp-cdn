@@ -8,7 +8,7 @@ interface TokenManagerOptions {
   period: number;
 }
 
-export default class {
+export default class TokenManager {
   private period: number;
 
   private tokenList = new Map<string, number>();
