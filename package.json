@@ -1,6 +1,6 @@
 {
   "name": "moosikapp-cdn",
-  "version": "3.1.8",
+  "version": "3.1.9",
   "description": "MoosikApp file storage.",
   "author": "Uwufule",
   "license": "MIT",
@@ -27,7 +27,7 @@
     "jsonwebtoken": "^8.5.1",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
-    "yadisk-mgr": "https://github.com/Ferisef/yadisk-mgr"
+    "yadisk-mgr": "https://github.com/uwufule/yadisk-mgr"
   },
   "devDependencies": {
     "@types/cors": "^2.8.6",

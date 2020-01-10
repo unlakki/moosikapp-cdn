@@ -47,7 +47,7 @@ app.put('/upload-target/:target', async (req: Request, res: Response) => {
     tokenManager.add(token);
 
     const extension = parseExtension(contentType);
-    const { path } = await diskManager.uploadFile(req, extension);
+    const path = await diskManager.uploadFile(req, extension);
 
     res.status(201).send(path);
   } catch (e) {
