@@ -1,15 +1,15 @@
 {
   "name": "moosikapp-cdn",
-  "version": "3.1.9",
+  "version": "3.1.10",
   "description": "MoosikApp file storage.",
   "author": "Uwufule",
   "license": "MIT",
   "main": "dist/server.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ferisef/moosikapp-cdn"
+    "url": "https://github.com/uwufule/moosikapp-cdn"
   },
-  "homepage": "https://github.com/ferisef/moosikapp-cdn#readme",
+  "homepage": "https://github.com/uwufule/moosikapp-cdn#readme",
   "keywords": [],
   "scripts": {
     "start": "node dist/server.js",
@@ -18,7 +18,7 @@
   },
   "private": true,
   "bugs": {
-    "url": "https://github.com/ferisef/moosikapp-cdn/issues"
+    "url": "https://github.com/uwufule/moosikapp-cdn/issues"
   },
   "dependencies": {
     "cors": "^2.8.5",
