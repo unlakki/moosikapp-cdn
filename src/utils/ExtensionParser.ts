@@ -1,6 +1,4 @@
 export class ExtensionParserError extends Error {
-  readonly name: string;
-
   constructor(message: string) {
     super(message);
     this.name = 'ExtensionParserError';
