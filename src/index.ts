@@ -38,7 +38,7 @@ app.put('/upload-target/:target', async (req: Request, res: Response) => {
       throw new HTTPError(400, 'No `Content-Type` header provided.');
     }
 
-    const token = JWT.verify(req.params.target, String(JWT_SECRET)) as JWTToken;
+    const token = <JWTToken>JWT.verify(req.params.target, String(JWT_SECRET));
 
     if (tokenManager.has(token)) {
       throw new HTTPError(410, 'Gone.');
@@ -47,7 +47,7 @@ app.put('/upload-target/:target', async (req: Request, res: Response) => {
     tokenManager.add(token);
 
     const extension = parseExtension(contentType);
-    const path = await diskManager.uploadFile(req, extension);
+    const path = await diskManager.uploadFile(req, { extension });
 
     res.status(201).send(path);
   } catch (e) {
