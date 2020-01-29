@@ -1,9 +1,9 @@
-import DiskManager from 'yadisk-mgr';
 import Express, { Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import JWT, { JsonWebTokenError } from 'jsonwebtoken';
 import request from 'request-promise';
+import DiskManager from 'yadisk-mgr';
 import parseExtension, { ExtensionParserError } from './utils/ExtensionParser';
 import HTTPError from './errors/HTTPError';
 import TokenManager, { JWTToken } from './utils/TokenManager';
@@ -13,7 +13,7 @@ const { PORT, TOKEN_LIST, JWT_SECRET } = process.env;
 const tokenList = JSON.parse(String(TOKEN_LIST));
 const diskManager = new DiskManager(tokenList);
 
-const tokenManager = new TokenManager({ period: 60000 });
+const tokenManager = new TokenManager();
 
 const app = Express();
 

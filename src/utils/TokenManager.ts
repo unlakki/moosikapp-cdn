@@ -1,54 +1,54 @@
+import redis, { RedisClient } from 'redis';
+
+const { REDIS_HOST, REDIS_PORT, REDIS_PASSWORD } = process.env;
+
 export interface JWTToken {
   hex: string;
   iat: number;
   exp: number;
 }
 
-interface TokenManagerOptions {
-  period: number;
-}
-
 export default class TokenManager {
-  private period: number;
+  private client: RedisClient;
 
-  private tokenList = new Map<string, number>();
-
-  private timer: NodeJS.Timeout;
-
-  constructor(options: TokenManagerOptions) {
-    this.period = options.period;
-    this.start();
+  constructor() {
+    this.client = redis.createClient({
+      host: REDIS_HOST,
+      port: Number(REDIS_PORT),
+      password: REDIS_PASSWORD,
+    });
   }
 
-  public start() {
-    this.timer = setInterval(this.check, this.period);
+  public async add(token: JWTToken): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.client.set(token.hex, '', (e1, r1) => {
+        if (e1) {
+          reject(e1);
+          return;
+        }
+
+        this.client.expire(token.hex, token.exp - Math.ceil(Date.now() / 1000), (e2, r2) => {
+          if (e2) {
+            reject(e2);
+            return;
+          }
+
+          resolve(r1 === 'OK' && r2 === 1);
+        });
+      });
+    });
   }
 
-  public stop() {
-    clearInterval(this.timer);
-  }
+  public async has(token: JWTToken): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.client.exists(token.hex, (e, r) => {
+        if (e) {
+          reject(e);
+          return;
+        }
 
-  public add(token: JWTToken) {
-    this.tokenList.set(token.hex, token.exp);
-  }
-
-  public has(token: JWTToken) {
-    return this.tokenList.has(token.hex);
-  }
-
-  private check() {
-    if (!this.tokenList) {
-      this.tokenList = new Map<string, number>();
-    }
-
-    this.tokenList = Object.entries(this.tokenList).reduce((list, token) => {
-      const now = Date.now();
-
-      if (now < token[1] * 1000) {
-        list.set(token[0], token[1]);
-      }
-
-      return list;
-    }, new Map<string, number>());
+        resolve(r === 1);
+      });
+    });
   }
 }
