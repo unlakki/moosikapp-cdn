@@ -13,7 +13,7 @@ const { PORT, TOKEN_LIST, JWT_SECRET } = process.env;
 const tokenList = JSON.parse(String(TOKEN_LIST));
 const diskManager = new DiskManager(tokenList);
 
-const tokenManager = new TokenManager({ period: 60000 });
+const tokenManager = new TokenManager();
 
 const app = Express();
 
