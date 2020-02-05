@@ -4,7 +4,7 @@ import cors from 'cors';
 import JWT, { JsonWebTokenError } from 'jsonwebtoken';
 import request from 'request-promise';
 import DiskManager from 'yadisk-mgr';
-import parseExtension, { ExtensionParserError } from './utils/ExtensionParser';
+import MimeTypes from 'mime-types';
 import HTTPError from './errors/HTTPError';
 import TokenManager, { JWTToken } from './utils/TokenManager';
 
@@ -23,7 +23,6 @@ app.use(cors());
 app.get('*', async (req: Request, res: Response) => {
   try {
     const uri = await diskManager.getFileLink(req.path);
-
     request(uri).pipe(res);
   } catch (e) {
     res.status(404).send('Not Found.');
@@ -46,18 +45,16 @@ app.put('/upload-target/:target', async (req: Request, res: Response) => {
 
     tokenManager.add(token);
 
-    const extension = parseExtension(contentType);
-    const path = await diskManager.uploadFile(req, { extension });
+    const extension = MimeTypes.extension(contentType);
+    if (!extension) {
+      throw new HTTPError(415, 'Incorrect `Content-Type` header provided.');
+    }
 
+    const path = await diskManager.uploadFile(req, { extension });
     res.status(201).send(path);
   } catch (e) {
     if (e instanceof JsonWebTokenError) {
       res.status(410).send('Gone.');
-      return;
-    }
-
-    if (e instanceof ExtensionParserError) {
-      res.status(415).send('Incorrect `Content-Type` header provided.');
       return;
     }
 
