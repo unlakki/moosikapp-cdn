@@ -6,7 +6,7 @@ import JWT, { JsonWebTokenError } from 'jsonwebtoken';
 import request from 'request-promise';
 import DiskManager from 'yadisk-mgr';
 import filesize from 'filesize';
-import TokenManager, { JWTToken } from './utils/TokenManager';
+import UploadTargetManager, { IUploadTarget } from './utils/UploadTargetManager';
 import checkAuth from './utils/authorization';
 import getExtensionFromContentType from './utils/getExtensionFromContentType';
 import errorHandler from './utils/errorHandler';
@@ -17,7 +17,7 @@ const { PORT, TOKEN_LIST, JWT_SECRET } = process.env;
 const tokenList = JSON.parse(String(TOKEN_LIST));
 const diskManager = new DiskManager(tokenList);
 
-const tokenManager = new TokenManager();
+const uploadTargetManager = new UploadTargetManager();
 
 const app = Express();
 
@@ -77,9 +77,9 @@ app.get('*', async (req: Request, res: Response) => {
 
 app.put('/upload-target/:target', async (req: Request, res: Response) => {
   try {
-    const token = <JWTToken>JWT.verify(req.params.target, String(JWT_SECRET));
+    const jwt = <IUploadTarget>JWT.verify(req.params.target, String(JWT_SECRET));
 
-    if (tokenManager.has(token)) {
+    if (uploadTargetManager.has(jwt)) {
       throw new HTTPError(410, 'Gone.');
     }
 
@@ -89,7 +89,7 @@ app.put('/upload-target/:target', async (req: Request, res: Response) => {
     }
     const extension = getExtensionFromContentType(contentType);
 
-    tokenManager.add(token);
+    uploadTargetManager.add(jwt);
 
     const path = await diskManager.uploadFile(req, { extension });
     res.status(201).send(path);

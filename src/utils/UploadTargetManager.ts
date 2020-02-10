@@ -2,7 +2,7 @@ import redis, { RedisClient } from 'redis';
 
 const { REDIS_HOST, REDIS_PORT, REDIS_PASSWORD } = process.env;
 
-export interface JWTToken {
+export interface IUploadTarget {
   hex: string;
   iat: number;
   exp: number;
@@ -19,15 +19,17 @@ export default class TokenManager {
     });
   }
 
-  public async add(token: JWTToken): Promise<boolean> {
+  public async add(uploadTaget: IUploadTarget): Promise<boolean> {
+    const { hex, exp } = uploadTaget;
+
     return new Promise((resolve, reject) => {
-      this.client.set(token.hex, '', (e1, r1) => {
+      this.client.set(hex, '', (e1, r1) => {
         if (e1) {
           reject(e1);
           return;
         }
 
-        this.client.expire(token.hex, token.exp - Math.ceil(Date.now() / 1000), (e2, r2) => {
+        this.client.expire(hex, exp - Math.ceil(Date.now() / 1000), (e2, r2) => {
           if (e2) {
             reject(e2);
             return;
@@ -39,7 +41,7 @@ export default class TokenManager {
     });
   }
 
-  public async has(token: JWTToken): Promise<boolean> {
+  public async has(token: IUploadTarget): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.client.exists(token.hex, (e, r) => {
         if (e) {
