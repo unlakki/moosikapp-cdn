@@ -8,8 +8,7 @@ import DiskManager from 'yadisk-mgr';
 import filesize from 'filesize';
 import UploadTargetManager, { IUploadTarget } from './utils/UploadTargetManager';
 import checkAuth from './utils/authorization';
-import getExtensionFromContentType from './utils/getExtensionFromContentType';
-import errorHandler from './utils/errorHandler';
+import contentTypeToExtension from './utils/contentTypeToExtension';
 import HTTPError from './errors/HTTPError';
 
 const { PORT, TOKEN_LIST, JWT_SECRET } = process.env;
