@@ -44,7 +44,7 @@ app.get('*', async (req: Request, res: Response) => {
     try {
       const { authorization } = req.headers;
       if (!authorization || !authorization.startsWith('Bearer')) {
-        throw new HTTPError(401, 'Access denier');
+        throw new HTTPError(401, 'Access denied.');
       }
 
       const accessToken = authorization.slice(7);
