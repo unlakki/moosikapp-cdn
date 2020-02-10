@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import JWT, { JsonWebTokenError } from 'jsonwebtoken';
 import request from 'request-promise';
-import DiskManager from 'yadisk-mgr';
+import DiskManager, { DiskManagerError } from 'yadisk-mgr';
 import filesize from 'filesize';
 import TokenManager, { JWTToken } from './utils/TokenManager';
 import checkAuth from './utils/authorization';
@@ -37,8 +37,10 @@ app.get('/status.json', async (req, res) => {
 });
 
 app.get('*', async (req: Request, res: Response) => {
+  const path = decodeURI(req.path);
+
   try {
-    const uri = await diskManager.getFileLink(req.path);
+    const uri = await diskManager.getFileLink(path);
     request(uri).pipe(res);
   } catch (e1) {
     try {
@@ -50,15 +52,15 @@ app.get('*', async (req: Request, res: Response) => {
       const accessToken = authorization.slice(7);
       checkAuth(accessToken);
 
-      const dirList = await diskManager.getDirList(req.path);
+      const dirList = await diskManager.getDirList(path);
       res.status(200).render('dirList', {
         dirList: dirList.map((item) => {
-          const path = `${req.path}${req.path.endsWith('/') ? '' : '/'}`;
+          const basePath = `${path}${path.endsWith('/') ? '' : '/'}`;
 
           return {
             ...item,
             size: item.size ? filesize(item.size) : 'N/A',
-            link: `${path}${item.name}`,
+            link: `${basePath}${item.name}`,
           };
         }),
       });
@@ -68,7 +70,7 @@ app.get('*', async (req: Request, res: Response) => {
         return;
       }
 
-      res.status(500).send('Internal server error.');
+      res.status(404).send('Not found.');
     }
   }
 });
