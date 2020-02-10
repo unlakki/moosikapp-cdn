@@ -86,7 +86,7 @@ app.put('/upload-target/:target', async (req: Request, res: Response) => {
     if (!contentType) {
       throw new HTTPError(400, 'No `Content-Type` header provided.');
     }
-    const extension = getExtensionFromContentType(contentType);
+    const extension = contentTypeToExtension(contentType);
 
     uploadTargetManager.add(jwt);
 
@@ -106,7 +106,5 @@ app.put('/upload-target/:target', async (req: Request, res: Response) => {
     res.status(500).send('Internal server error.');
   }
 });
-
-app.use(errorHandler);
 
 app.listen(Number(PORT));
