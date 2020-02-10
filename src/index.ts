@@ -1,15 +1,16 @@
 import Path from 'path';
-import Express, { Request, Response, NextFunction } from 'express';
+import Express, { Request, Response } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import JWT, { JsonWebTokenError } from 'jsonwebtoken';
 import request from 'request-promise';
 import DiskManager from 'yadisk-mgr';
-import MimeTypes from 'mime-types';
 import filesize from 'filesize';
 import HTTPError from './errors/HTTPError';
 import TokenManager, { JWTToken } from './utils/TokenManager';
 import checkAuth from './utils/authorization';
+import getExtensionFromContentType from './utils/getExtensionFromContentType';
+import errorHandler from './utils/errorHandler';
 
 const { PORT, TOKEN_LIST, JWT_SECRET } = process.env;
 
@@ -63,25 +64,20 @@ app.get('*', async (req: Request, res: Response) => {
 });
 
 app.put('/upload-target/:target', async (req: Request, res: Response) => {
-  const { 'content-type': contentType } = req.headers;
-
   try {
-    if (!contentType) {
-      throw new HTTPError(400, 'No `Content-Type` header provided.');
-    }
-
     const token = <JWTToken>JWT.verify(req.params.target, String(JWT_SECRET));
 
     if (tokenManager.has(token)) {
       throw new HTTPError(410, 'Gone.');
     }
 
-    tokenManager.add(token);
-
-    const extension = MimeTypes.extension(contentType);
-    if (!extension) {
-      throw new HTTPError(415, 'Incorrect `Content-Type` header provided.');
+    const { 'content-type': contentType } = req.headers;
+    if (!contentType) {
+      throw new HTTPError(400, 'No `Content-Type` header provided.');
     }
+    const extension = getExtensionFromContentType(contentType);
+
+    tokenManager.add(token);
 
     const path = await diskManager.uploadFile(req, { extension });
     res.status(201).send(path);
@@ -100,12 +96,6 @@ app.put('/upload-target/:target', async (req: Request, res: Response) => {
   }
 });
 
-app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  if (!error) {
-    next();
-  }
-
-  res.status(500).send('Internal server error.');
-});
+app.use(errorHandler);
 
 app.listen(Number(PORT));
