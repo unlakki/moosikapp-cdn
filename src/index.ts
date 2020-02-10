@@ -6,11 +6,11 @@ import JWT, { JsonWebTokenError } from 'jsonwebtoken';
 import request from 'request-promise';
 import DiskManager from 'yadisk-mgr';
 import filesize from 'filesize';
-import HTTPError from './errors/HTTPError';
 import TokenManager, { JWTToken } from './utils/TokenManager';
 import checkAuth from './utils/authorization';
 import getExtensionFromContentType from './utils/getExtensionFromContentType';
 import errorHandler from './utils/errorHandler';
+import HTTPError from './errors/HTTPError';
 
 const { PORT, TOKEN_LIST, JWT_SECRET } = process.env;
 
@@ -26,6 +26,15 @@ app.use(cors());
 
 app.set('view engine', 'pug');
 app.set('views', Path.resolve('src/views'));
+
+app.get('/status.json', async (req, res) => {
+  try {
+    const status = await diskManager.getStatus();
+    res.status(200).send(status);
+  } catch (e) {
+    res.status(500).send('Internal server error.');
+  }
+});
 
 app.get('*', async (req: Request, res: Response) => {
   try {
@@ -56,6 +65,7 @@ app.get('*', async (req: Request, res: Response) => {
     } catch (e2) {
       if (e2 instanceof HTTPError) {
         res.status(e2.statusCode).send(e2.message);
+        return;
       }
 
       res.status(500).send('Internal server error.');
