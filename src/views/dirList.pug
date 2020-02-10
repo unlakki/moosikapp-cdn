@@ -1,0 +1,16 @@
+html
+  head
+  body
+    table
+      thead
+        tr
+          td Name
+          td Type
+          td Size
+      tbody
+        each item in dirList
+          tr
+            td
+              a(href=item.link)= item.name
+            td= item.type
+            td= item.size
