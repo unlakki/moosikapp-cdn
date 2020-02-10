@@ -3,15 +3,19 @@ import HTTPError from '../errors/HTTPError';
 
 const { JWT_SECRET } = process.env;
 
-interface AccessToken {
+interface IAccessToken {
   role: number;
 }
 
 export default (accessToken: string): boolean => {
-  const jwt = <AccessToken>JWT.verify(accessToken, String(JWT_SECRET));
-  if (jwt.role < 1024) {
+  try {
+    const jwt = <IAccessToken>JWT.verify(accessToken, String(JWT_SECRET));
+    if (jwt.role < 1024) {
+      throw new Error();
+    }
+
+    return true;
+  } catch (e) {
     throw new HTTPError(401, 'Access denied.');
   }
-
-  return true;
 };
