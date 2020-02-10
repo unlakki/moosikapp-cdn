@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import JWT, { JsonWebTokenError } from 'jsonwebtoken';
 import request from 'request-promise';
-import DiskManager, { DiskManagerError } from 'yadisk-mgr';
+import DiskManager from 'yadisk-mgr';
 import filesize from 'filesize';
 import TokenManager, { JWTToken } from './utils/TokenManager';
 import checkAuth from './utils/authorization';
