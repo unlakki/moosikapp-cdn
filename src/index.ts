@@ -2,13 +2,14 @@ import Path from 'path';
 import Express, { Request, Response } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
-import JWT, { JsonWebTokenError } from 'jsonwebtoken';
+import JWT from 'jsonwebtoken';
 import request from 'request-promise';
-import DiskManager from 'yadisk-mgr';
 import filesize from 'filesize';
+import DiskManager from 'yadisk-mgr';
 import UploadTargetManager, { IUploadTarget } from './utils/UploadTargetManager';
 import checkAuth from './utils/authorization';
 import contentTypeToExtension from './utils/contentTypeToExtension';
+import asyncErrorHandler, { withAsyncErrorHandler } from './middlewares/asyncErrorHandler';
 import HTTPError from './errors/HTTPError';
 
 const { PORT, TOKEN_LIST, JWT_SECRET } = process.env;
@@ -26,56 +27,49 @@ app.use(cors());
 app.set('view engine', 'pug');
 app.set('views', Path.resolve('src/views'));
 
-app.get('/status.json', async (req, res) => {
-  try {
+app.get('/status.json', withAsyncErrorHandler(
+  async (req: Request, res: Response) => {
     const status = await diskManager.getStatus();
     res.status(200).send(status);
-  } catch (e) {
-    res.status(500).send('Internal server error.');
-  }
-});
+  },
+));
 
-app.get('*', async (req: Request, res: Response) => {
-  const path = decodeURI(req.path);
+app.get('*', withAsyncErrorHandler(
+  async (req: Request, res: Response) => {
+    const path = decodeURI(req.path);
 
-  try {
-    const uri = await diskManager.getFileLink(path);
-    request(uri).pipe(res);
-  } catch (e1) {
     try {
-      const { authorization } = req.headers;
-      if (!authorization || !authorization.startsWith('Bearer')) {
-        throw new HTTPError(401, 'Access denied.');
+      const uri = await diskManager.getFileLink(path);
+      request(uri).pipe(res);
+    } catch (e1) {
+      try {
+        checkAuth(req);
+
+        const dirList = await diskManager.getDirList(path);
+        res.status(200).render('dirList', {
+          dirList: dirList.map((item) => {
+            const basePath = `${path}${path.endsWith('/') ? '' : '/'}`;
+
+            return {
+              ...item,
+              size: item.size ? filesize(item.size) : 'N/A',
+              link: `${basePath}${item.name}`,
+            };
+          }),
+        });
+      } catch (e2) {
+        if (e2 instanceof HTTPError) {
+          throw e2;
+        }
+
+        throw new HTTPError(404, 'Not found.');
       }
-
-      const accessToken = authorization.slice(7);
-      checkAuth(accessToken);
-
-      const dirList = await diskManager.getDirList(path);
-      res.status(200).render('dirList', {
-        dirList: dirList.map((item) => {
-          const basePath = `${path}${path.endsWith('/') ? '' : '/'}`;
-
-          return {
-            ...item,
-            size: item.size ? filesize(item.size) : 'N/A',
-            link: `${basePath}${item.name}`,
-          };
-        }),
-      });
-    } catch (e2) {
-      if (e2 instanceof HTTPError) {
-        res.status(e2.statusCode).send(e2.message);
-        return;
-      }
-
-      res.status(404).send('Not found.');
     }
-  }
-});
+  },
+));
 
-app.put('/upload-target/:target', async (req: Request, res: Response) => {
-  try {
+app.put('/upload-target/:target', withAsyncErrorHandler(
+  async (req: Request, res: Response) => {
     const jwt = <IUploadTarget>JWT.verify(req.params.target, String(JWT_SECRET));
 
     if (uploadTargetManager.has(jwt)) {
@@ -92,19 +86,9 @@ app.put('/upload-target/:target', async (req: Request, res: Response) => {
 
     const path = await diskManager.uploadFile(req, { extension });
     res.status(201).send(path);
-  } catch (e) {
-    if (e instanceof JsonWebTokenError) {
-      res.status(410).send('Gone.');
-      return;
-    }
+  },
+));
 
-    if (e instanceof HTTPError) {
-      res.status(e.statusCode).send(e.message);
-      return;
-    }
-
-    res.status(500).send('Internal server error.');
-  }
-});
+app.use(asyncErrorHandler);
 
 app.listen(Number(PORT));
