@@ -1,7 +1,6 @@
 import {
   Request, Response, NextFunction, RequestHandler,
 } from 'express';
-import { JsonWebTokenError } from 'jsonwebtoken';
 import HTTPError from '../errors/HTTPError';
 
 export const withAsyncErrorHandler = (...handlers: RequestHandler[]) => (
@@ -19,11 +18,6 @@ export const withAsyncErrorHandler = (...handlers: RequestHandler[]) => (
 export default (error: Error, req: Request, res: Response, next: NextFunction) => {
   if (!error) {
     next();
-    return;
-  }
-
-  if (error instanceof JsonWebTokenError) {
-    res.status(410).send('Gone.');
     return;
   }
 

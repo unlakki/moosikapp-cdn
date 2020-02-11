@@ -42,9 +42,9 @@ app.get('*', withAsyncErrorHandler(
       const uri = await diskManager.getFileLink(path);
       request(uri).pipe(res);
     } catch (e1) {
-      try {
-        checkAuth(req);
+      checkAuth(req);
 
+      try {
         const dirList = await diskManager.getDirList(path);
         res.status(200).render('dirList', {
           dirList: dirList.map((item) => {
@@ -58,10 +58,6 @@ app.get('*', withAsyncErrorHandler(
           }),
         });
       } catch (e2) {
-        if (e2 instanceof HTTPError) {
-          throw e2;
-        }
-
         throw new HTTPError(404, 'Not found.');
       }
     }
@@ -70,7 +66,12 @@ app.get('*', withAsyncErrorHandler(
 
 app.put('/upload-target/:target', withAsyncErrorHandler(
   async (req: Request, res: Response) => {
-    const jwt = <IUploadTarget>JWT.verify(req.params.target, String(JWT_SECRET));
+    let jwt;
+    try {
+      jwt = <IUploadTarget>JWT.verify(req.params.target, String(JWT_SECRET));
+    } catch (e) {
+      throw new HTTPError(410, 'Gone.');
+    }
 
     if (uploadTargetManager.has(jwt)) {
       throw new HTTPError(410, 'Gone.');
