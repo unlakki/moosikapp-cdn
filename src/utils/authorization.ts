@@ -1,4 +1,3 @@
-import { Request } from 'express';
 import JWT from 'jsonwebtoken';
 import HttpErrors from 'http-errors';
 
@@ -8,12 +7,7 @@ interface IAccessToken {
   role: number;
 }
 
-export default (req: Request): boolean => {
-  const { authorization } = req.headers;
-  if (!authorization || !authorization.startsWith('Bearer')) {
-    throw new HttpErrors.Unauthorized('Access deny.');
-  }
-
+export default (authorization: string): boolean => {
   const accessToken = authorization.slice(7);
 
   let jwt;

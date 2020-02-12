@@ -42,7 +42,11 @@ app.get('*', withAsyncErrorHandler(
       const uri = await diskManager.getFileLink(path);
       request(uri).pipe(res);
     } catch (e1) {
-      checkAuth(req);
+      const { authorization } = req.headers;
+      if (!authorization || !authorization.startsWith('Bearer')) {
+        throw new HttpErrors.Unauthorized('Access deny.');
+      }
+      checkAuth(authorization);
 
       try {
         const dirList = await diskManager.getDirList(path);
