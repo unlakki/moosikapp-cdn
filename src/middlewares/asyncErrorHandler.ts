@@ -1,7 +1,10 @@
 import {
   Request, Response, NextFunction, RequestHandler,
 } from 'express';
-import HTTPError from '../errors/HTTPError';
+
+interface MaybeHttpError extends Error {
+  statusCode?: number;
+}
 
 export const withAsyncErrorHandler = (...handlers: RequestHandler[]) => (
   handlers.map((handler) => (
@@ -15,14 +18,14 @@ export const withAsyncErrorHandler = (...handlers: RequestHandler[]) => (
   ))
 );
 
-export default (error: Error, req: Request, res: Response, next: NextFunction) => {
+export default (error: MaybeHttpError, req: Request, res: Response, next: NextFunction) => {
   if (!error) {
     next();
     return;
   }
 
-  if (error instanceof HTTPError) {
-    res.status(error.statusCode).send(error.message);
+  if (error.statusCode && error.message) {
+    res.status(error.statusCode).send({ message: error.message });
     return;
   }
 

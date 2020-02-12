@@ -6,11 +6,11 @@ import JWT from 'jsonwebtoken';
 import request from 'request-promise';
 import filesize from 'filesize';
 import DiskManager from 'yadisk-mgr';
+import HttpErrors from 'http-errors';
 import UploadTargetManager, { IUploadTarget } from './utils/UploadTargetManager';
 import checkAuth from './utils/authorization';
 import contentTypeToExtension from './utils/contentTypeToExtension';
 import asyncErrorHandler, { withAsyncErrorHandler } from './middlewares/asyncErrorHandler';
-import HTTPError from './errors/HTTPError';
 
 const { PORT, TOKEN_LIST, JWT_SECRET } = process.env;
 
@@ -58,7 +58,7 @@ app.get('*', withAsyncErrorHandler(
           }),
         });
       } catch (e2) {
-        throw new HTTPError(404, 'Not found.');
+        throw new HttpErrors.NotFound('Not found.');
       }
     }
   },
@@ -70,16 +70,16 @@ app.put('/upload-target/:target', withAsyncErrorHandler(
     try {
       jwt = <IUploadTarget>JWT.verify(req.params.target, String(JWT_SECRET));
     } catch (e) {
-      throw new HTTPError(410, 'Gone.');
+      throw new HttpErrors.Gone('Gone.');
     }
 
     if (uploadTargetManager.has(jwt)) {
-      throw new HTTPError(410, 'Gone.');
+      throw new HttpErrors.Gone('Gone.');
     }
 
     const { 'content-type': contentType } = req.headers;
     if (!contentType) {
-      throw new HTTPError(400, 'No `Content-Type` header provided.');
+      throw new HttpErrors.BadRequest('No `Content-Type` header provided.');
     }
     const extension = contentTypeToExtension(contentType);
 
