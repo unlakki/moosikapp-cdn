@@ -7,8 +7,8 @@ import request from 'request-promise';
 import filesize from 'filesize';
 import DiskManager from 'yadisk-mgr';
 import HttpErrors from 'http-errors';
-import UploadTargetManager, { IUploadTarget } from './utils/UploadTargetManager';
-import checkAuth from './utils/authorization';
+import UploadTargetManager, { UploadTarget } from './managers/UploadTargetManager';
+import checkAuth from './utils/checkAuth';
 import contentTypeToExtension from './utils/contentTypeToExtension';
 import asyncErrorHandler, { withAsyncErrorHandler } from './middlewares/asyncErrorHandler';
 
@@ -46,7 +46,7 @@ app.get('*', withAsyncErrorHandler(
       if (!authorization || !authorization.startsWith('Bearer')) {
         throw new HttpErrors.Unauthorized('Access deny.');
       }
-      checkAuth(authorization);
+      checkAuth(authorization.slice(7));
 
       try {
         const dirList = await diskManager.getDirList(path);
@@ -72,7 +72,7 @@ app.put('/upload-target/:target', withAsyncErrorHandler(
   async (req: Request, res: Response) => {
     let jwt;
     try {
-      jwt = <IUploadTarget>JWT.verify(req.params.target, String(JWT_SECRET));
+      jwt = <UploadTarget>JWT.verify(req.params.target, String(JWT_SECRET));
     } catch (e) {
       throw new HttpErrors.Gone('Gone.');
     }

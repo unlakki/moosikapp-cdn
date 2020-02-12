@@ -3,16 +3,14 @@ import HttpErrors from 'http-errors';
 
 const { JWT_SECRET } = process.env;
 
-interface IAccessToken {
+interface AccessToken {
   role: number;
 }
 
-export default (authorization: string): boolean => {
-  const accessToken = authorization.slice(7);
-
+export default (accessToken: string): boolean => {
   let jwt;
   try {
-    jwt = <IAccessToken>JWT.verify(accessToken, String(JWT_SECRET));
+    jwt = <AccessToken>JWT.verify(accessToken, String(JWT_SECRET));
   } catch (e) {
     throw new HttpErrors.Unauthorized('Access deny.');
   }

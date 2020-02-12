@@ -2,13 +2,13 @@ import redis, { RedisClient } from 'redis';
 
 const { REDIS_HOST, REDIS_PORT, REDIS_PASSWORD } = process.env;
 
-export interface IUploadTarget {
+export interface UploadTarget {
   hex: string;
   iat: number;
   exp: number;
 }
 
-export default class TokenManager {
+export default class UploadTargetManager {
   private client: RedisClient;
 
   constructor() {
@@ -19,7 +19,7 @@ export default class TokenManager {
     });
   }
 
-  public async add(uploadTaget: IUploadTarget): Promise<boolean> {
+  public async add(uploadTaget: UploadTarget): Promise<boolean> {
     const { hex, exp } = uploadTaget;
 
     return new Promise((resolve, reject) => {
@@ -41,7 +41,7 @@ export default class TokenManager {
     });
   }
 
-  public async has(token: IUploadTarget): Promise<boolean> {
+  public async has(token: UploadTarget): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.client.exists(token.hex, (e, r) => {
         if (e) {
