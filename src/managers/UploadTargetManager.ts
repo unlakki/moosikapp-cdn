@@ -41,9 +41,9 @@ export default class UploadTargetManager {
     });
   }
 
-  public async has(token: UploadTarget): Promise<boolean> {
+  public async has(uploadTaget: UploadTarget): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.client.exists(token.hex, (e, r) => {
+      this.client.exists(uploadTaget.hex, (e, r) => {
         if (e) {
           reject(e);
           return;

@@ -77,7 +77,8 @@ app.put('/upload-target/:target', withAsyncErrorHandler(
       throw new HttpErrors.Gone('Gone.');
     }
 
-    if (uploadTargetManager.has(jwt)) {
+    const has = await uploadTargetManager.has(jwt);
+    if (has) {
       throw new HttpErrors.Gone('Gone.');
     }
 
@@ -87,9 +88,15 @@ app.put('/upload-target/:target', withAsyncErrorHandler(
     }
     const extension = contentTypeToExtension(contentType);
 
-    uploadTargetManager.add(jwt);
+    let path;
+    try {
+      path = await diskManager.uploadFile(req, { extension });
+    } catch (e) {
+      throw new HttpErrors.Conflict('Resource already exists.');
+    }
 
-    const path = await diskManager.uploadFile(req, { extension });
+    await uploadTargetManager.add(jwt);
+
     res.status(201).send(path);
   },
 ));
