@@ -1,5 +1,5 @@
 import {
-  Request, Response, NextFunction, RequestHandler,
+  RequestHandler, Request, Response, NextFunction,
 } from 'express';
 
 interface MaybeHttpError extends Error {
@@ -25,7 +25,7 @@ export default (error: MaybeHttpError, req: Request, res: Response, next: NextFu
   }
 
   if (error.statusCode && error.message) {
-    res.status(error.statusCode).send({ message: error.message });
+    res.status(error.statusCode).send(error.message);
     return;
   }
 
