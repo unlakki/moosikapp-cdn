@@ -4,12 +4,12 @@ import helmet from 'helmet';
 import cors from 'cors';
 import JWT from 'jsonwebtoken';
 import request from 'request-promise';
+import FileType from 'file-type';
 import filesize from 'filesize';
 import DiskManager from 'yadisk-mgr';
 import HttpErrors from 'http-errors';
 import UploadTargetManager, { UploadTarget } from './managers/UploadTargetManager';
 import checkAuth from './utils/checkAuth';
-import contentTypeToExtension from './utils/contentTypeToExtension';
 import asyncErrorHandler, { withAsyncErrorHandler } from './middlewares/asyncErrorHandler';
 
 const { PORT, TOKEN_LIST, JWT_SECRET } = process.env;
@@ -44,7 +44,7 @@ app.get('*', withAsyncErrorHandler(
     } catch (e1) {
       const { authorization } = req.headers;
       if (!authorization || !authorization.startsWith('Bearer')) {
-        throw new HttpErrors.Unauthorized('Access deny.');
+        throw new HttpErrors.Forbidden('Access denied.');
       }
       checkAuth(authorization.slice(7));
 
@@ -86,11 +86,16 @@ app.put('/upload-target/:target', withAsyncErrorHandler(
     if (!contentType) {
       throw new HttpErrors.BadRequest('No `Content-Type` header provided.');
     }
-    const extension = contentTypeToExtension(contentType);
+
+    const stream = await FileType.stream(req);
+
+    if (stream.fileType?.mime !== contentType) {
+      throw new HttpErrors.BadRequest('Bad request.');
+    }
 
     let path;
     try {
-      path = await diskManager.uploadFile(req, { extension });
+      path = await diskManager.uploadFile(stream, { extension: stream.fileType?.ext });
     } catch (e) {
       throw new HttpErrors.Conflict('Resource already exists.');
     }
