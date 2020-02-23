@@ -12,11 +12,11 @@ export default (accessToken: string): boolean => {
   try {
     jwt = <AccessToken>JWT.verify(accessToken, String(JWT_SECRET));
   } catch (e) {
-    throw new HttpErrors.Unauthorized('Access deny.');
+    throw new HttpErrors.Forbidden('Access denied.');
   }
 
   if (jwt.role < 1024) {
-    throw new HttpErrors.Unauthorized('Access deny.');
+    throw new HttpErrors.Forbidden('Access denied.');
   }
 
   return true;
