@@ -2,14 +2,14 @@
   "name": "moosikapp-cdn",
   "version": "3.5.28",
   "description": "MoosikApp file storage.",
-  "author": "Uwufule",
+  "author": "unlakki",
   "license": "MIT",
   "main": "dist/server.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/uwufule/moosikapp-cdn"
+    "url": "https://github.com/unlakki/moosikapp-cdn"
   },
-  "homepage": "https://github.com/uwufule/moosikapp-cdn#readme",
+  "homepage": "https://github.com/unlakki/moosikapp-cdn#readme",
   "keywords": [],
   "scripts": {
     "start": "node dist/server.js",
