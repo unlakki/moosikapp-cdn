@@ -1,6 +1,6 @@
 {
   "name": "moosikapp-cdn",
-  "version": "3.5.28",
+  "version": "3.5.29",
   "description": "MoosikApp file storage.",
   "author": "unlakki",
   "license": "MIT",
@@ -33,7 +33,7 @@
     "redis": "^2.8.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
-    "yadisk-mgr": "https://github.com/uwufule/yadisk-mgr"
+    "yadisk-mgr": "https://github.com/unlakki/yadisk-mgr"
   },
   "devDependencies": {
     "@types/cors": "^2.8.6",
