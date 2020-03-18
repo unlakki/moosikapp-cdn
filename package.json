@@ -18,7 +18,7 @@
   },
   "private": true,
   "bugs": {
-    "url": "https://github.com/uwufule/moosikapp-cdn/issues"
+    "url": "https://github.com/unlakki/moosikapp-cdn/issues"
   },
   "dependencies": {
     "cors": "^2.8.5",
