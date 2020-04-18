@@ -42,5 +42,5 @@ export default (diskManager: DiskManager) => async (req: Request, res: Response)
 
   await uploadTargetManager.add(jwt);
 
-  res.status(201).send(path);
+  res.status(201).header('Location', path).send();
 };
