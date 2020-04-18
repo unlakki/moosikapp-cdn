@@ -6,7 +6,7 @@ const Forbitten = (path: string) => new XmlHttpError(
   403,
   `Anonymous caller does not have storage.objects.${
     path === '/' ? 'list' : 'get'
-  } access to moosik.cdn${
+  } access to cdn.moosikapp${
     path.length > 1 ? path : ''
   }.`,
 );
