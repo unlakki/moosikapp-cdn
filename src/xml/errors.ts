@@ -7,20 +7,23 @@ const Forbitten = (path: string) => new XmlHttpError(
   `Anonymous caller does not have storage.objects.${
     path === '/' ? 'list' : 'get'
   } access to cdn.moosikapp${
-    path.length > 1 ? path : ''
+    path.length > 1 ? decodeURI(path) : ''
   }.`,
 );
 
-const NotFound = (path: string) => new XmlHttpError(404, `Server can't find ${path} object.`);
+const NotFound = (path: string) => new XmlHttpError(
+  404,
+  `Server can't find ${decodeURI(path)} object.`,
+);
 
 const Conflict = (path: string) => new XmlHttpError(
   409,
-  `Request ${path} conflict with current state of the server.`,
+  `Request ${decodeURI(path)} conflict with current state of the server.`,
 );
 
 const Gone = (path: string) => new XmlHttpError(
   410,
-  `Resource ${path} is no longer available.`,
+  `Resource ${decodeURI(path)} is no longer available.`,
 );
 
 const InternalServerError = () => new XmlHttpError(
