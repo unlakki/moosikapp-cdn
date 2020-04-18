@@ -1,10 +1,8 @@
 import {
   RequestHandler, Request, Response, NextFunction,
 } from 'express';
-
-interface MaybeHttpError extends Error {
-  statusCode?: number;
-}
+import { HttpError } from 'http-errors';
+import XmlHttpError from '../xml/XmlHttpError';
 
 export const withAsyncErrorHandler = (...handlers: RequestHandler[]) => (
   handlers.map((handler) => (
@@ -18,16 +16,24 @@ export const withAsyncErrorHandler = (...handlers: RequestHandler[]) => (
   ))
 );
 
-export default (error: MaybeHttpError, req: Request, res: Response, next: NextFunction) => {
+export default (error: Error, req: Request, res: Response, next: NextFunction) => {
   if (!error) {
     next();
     return;
   }
 
-  if (error.statusCode && error.message) {
-    res.status(error.statusCode).send(error.message);
+  if (error instanceof HttpError) {
+    res.status(error.status).send(error.message);
     return;
   }
 
-  res.status(500).send('Internal server error.');
+  if (error instanceof XmlHttpError) {
+    res.status(error.status).type('xml').send(error.message);
+    return;
+  }
+
+  res.status(500).type('xml').send(new XmlHttpError(
+    500,
+    'Server encountered an unexpected condition that prevented it from fulfilling the request.',
+  ));
 };

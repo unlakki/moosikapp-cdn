@@ -10,6 +10,7 @@ import getFile from './handlers/getFile';
 import getDirList from './handlers/getDirList';
 import uploadFile from './handlers/uploadFile';
 import asyncErrorHandler, { withAsyncErrorHandler } from './middlewares/asyncErrorHandler';
+import XmlError from './xml/errors';
 
 const { PORT, TOKEN_LIST } = process.env;
 
@@ -34,6 +35,10 @@ app.get('*', withAsyncErrorHandler(
 ));
 
 app.put('/upload-target/:target', withAsyncErrorHandler(uploadFile(diskManager)));
+
+app.all('*', withAsyncErrorHandler(() => {
+  throw XmlError.BadRequest('The resource you are trying to request does not exist.');
+}));
 
 app.use(asyncErrorHandler);
 

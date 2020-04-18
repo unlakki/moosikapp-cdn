@@ -21,6 +21,7 @@
     "url": "https://github.com/unlakki/moosikapp-cdn/issues"
   },
   "dependencies": {
+    "@types/xml": "^1.0.4",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "file-type": "^14.1.2",
@@ -33,6 +34,7 @@
     "redis": "^2.8.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
+    "xml": "^1.0.1",
     "yadisk-mgr": "https://github.com/unlakki/yadisk-mgr"
   },
   "devDependencies": {
