@@ -5,12 +5,11 @@ import cors from 'cors';
 import DiskManager from 'yadisk-mgr';
 import checkAuth from './middlewares/authorization';
 import checkPermissions from './middlewares/permissions';
+import getStatus from './handlers/getStatus';
 import getFile from './handlers/getFile';
 import getDirList from './handlers/getDirList';
+import uploadFile from './handlers/uploadFile';
 import asyncErrorHandler, { withAsyncErrorHandler } from './middlewares/asyncErrorHandler';
-import getStatus from './endpoints/getStatus';
-import get from './endpoints/get';
-import upload from './endpoints/upload';
 
 const { PORT, TOKEN_LIST } = process.env;
 
@@ -34,7 +33,7 @@ app.get('*', withAsyncErrorHandler(
   getDirList(diskManager),
 ));
 
-app.put('/upload-target/:target', withAsyncErrorHandler(upload(diskManager)));
+app.put('/upload-target/:target', withAsyncErrorHandler(uploadFile(diskManager)));
 
 app.use(asyncErrorHandler);
 
