@@ -30,7 +30,6 @@
     "http-errors": "^1.7.3",
     "jsonwebtoken": "^8.5.1",
     "mime-types": "^2.1.26",
-    "pug": "^2.0.4",
     "redis": "^2.8.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",

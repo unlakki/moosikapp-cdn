@@ -1,4 +1,3 @@
-import Path from 'path';
 import Express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
@@ -21,9 +20,6 @@ const app = Express();
 
 app.use(helmet({ hsts: false }));
 app.use(cors());
-
-app.set('view engine', 'pug');
-app.set('views', Path.resolve('src/views'));
 
 app.get('/status.json', withAsyncErrorHandler(getStatus(diskManager)));
 

@@ -1,27 +1,14 @@
 import { Request, Response } from 'express';
 import DiskManager from 'yadisk-mgr';
+import list from '../xml/list';
 import XmlErrors from '../xml/errors';
 
 export default (diskManager: DiskManager) => async (req: Request, res: Response) => {
-  const { authorization } = req.headers;
-  if (!authorization || !authorization.startsWith('Bearer')) {
-    throw new HttpErrors.Forbidden('Access denied.');
-  }
   const path = decodeURI(req.path);
 
   try {
     const dirList = await diskManager.getDirList(path);
-    res.status(200).render('dirList', {
-      dirList: dirList.map((item) => {
-        const basePath = `${path}${path.endsWith('/') ? '' : '/'}`;
-
-        return {
-          ...item,
-          size: item.size ? filesize(item.size) : 'N/A',
-          link: `${basePath}${item.name}`,
-        };
-      }),
-    });
+    res.status(200).type('xml').send(list(dirList));
   } catch (e) {
     throw XmlErrors.NotFound(req.path);
   }
