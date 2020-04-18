@@ -6,7 +6,7 @@ const list = (items: Resource[]) => xml({
   ItemList: items.map((item) => ({
     Item: [
       {
-        Name: item.name,
+        Name: decodeURI(item.name),
       },
       {
         Type: item.type,
