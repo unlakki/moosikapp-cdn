@@ -3,6 +3,10 @@ import Express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import DiskManager from 'yadisk-mgr';
+import checkAuth from './middlewares/authorization';
+import checkPermissions from './middlewares/permissions';
+import getFile from './handlers/getFile';
+import getDirList from './handlers/getDirList';
 import asyncErrorHandler, { withAsyncErrorHandler } from './middlewares/asyncErrorHandler';
 import getStatus from './endpoints/getStatus';
 import get from './endpoints/get';
@@ -23,7 +27,12 @@ app.set('views', Path.resolve('src/views'));
 
 app.get('/status.json', withAsyncErrorHandler(getStatus(diskManager)));
 
-app.get('*', withAsyncErrorHandler(get(diskManager)));
+app.get('*', withAsyncErrorHandler(
+  getFile(diskManager),
+  checkAuth(),
+  checkPermissions(1024),
+  getDirList(diskManager),
+));
 
 app.put('/upload-target/:target', withAsyncErrorHandler(upload(diskManager)));
 
