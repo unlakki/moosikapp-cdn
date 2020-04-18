@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import DiskManager from 'yadisk-mgr';
-import HttpErrors from 'http-errors';
 import JWT from 'jsonwebtoken';
 import FileType from 'file-type';
+import UploadTargetManager, { UploadTarget } from '../utils/UploadTargetManager';
 import XmlError from '../xml/errors';
 
 const { JWT_SECRET } = process.env;
