@@ -34,7 +34,7 @@
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
     "xml": "^1.0.1",
-    "yadisk-mgr": "https://github.com/unlakki/yadisk-mgr"
+    "yadisk-mgr": "https://github.com/unlakki/yadisk-mgr/archive/1.4.11.tar.gz"
   },
   "devDependencies": {
     "@types/cors": "^2.8.6",
