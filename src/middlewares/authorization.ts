@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import JWT from 'jsonwebtoken';
-import XmlError from '../xml/errors';
+import { createForbittenError } from '../utils/errors';
 
 const { JWT_SECRET } = process.env;
 
@@ -16,7 +16,7 @@ export default () => (
   async (req: AuthorizedRequest, res: Response, next: NextFunction) => {
     const { authorization } = req.headers;
     if (!authorization || !authorization.startsWith('Bearer')) {
-      throw XmlError.Forbitten(req.path);
+      throw createForbittenError(req.path);
     }
 
     const token = authorization.slice(7);
@@ -24,7 +24,7 @@ export default () => (
     try {
       req.jwt = <AccessToken>JWT.verify(token, String(JWT_SECRET));
     } catch (e) {
-      throw XmlError.Forbitten(req.path);
+      throw createForbittenError(req.path);
     }
 
     next();

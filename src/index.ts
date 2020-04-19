@@ -2,6 +2,7 @@ import Express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import DiskManager from 'yadisk-mgr';
+import HttpErrors from 'http-errors';
 import checkAuth from './middlewares/authorization';
 import checkPermissions from './middlewares/permissions';
 import getStatus from './handlers/getStatus';
@@ -9,7 +10,6 @@ import getFile from './handlers/getFile';
 import getDirList from './handlers/getDirList';
 import uploadFile from './handlers/uploadFile';
 import asyncErrorHandler, { withAsyncErrorHandler } from './middlewares/asyncErrorHandler';
-import XmlError from './xml/errors';
 
 const { PORT, TOKEN_LIST } = process.env;
 
@@ -33,7 +33,7 @@ app.get('*', withAsyncErrorHandler(
 app.put('/upload-target/:target', withAsyncErrorHandler(uploadFile(diskManager)));
 
 app.all('*', withAsyncErrorHandler(() => {
-  throw XmlError.BadRequest('The resource you are trying to request does not exist.');
+  throw new HttpErrors.BadRequest('The resource you are trying to request does not exist.');
 }));
 
 app.use(asyncErrorHandler);
