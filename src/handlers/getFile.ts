@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import DiskManager from 'yadisk-mgr';
+import { DiskManager } from 'yadisk-mgr';
 import request from 'request-promise';
 
 export default (diskManager: DiskManager) => (

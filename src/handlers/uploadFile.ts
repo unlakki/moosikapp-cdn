@@ -1,5 +1,6 @@
+import { Stream } from 'stream';
 import { Request, Response } from 'express';
-import DiskManager from 'yadisk-mgr';
+import { DiskManager } from 'yadisk-mgr';
 import JWT from 'jsonwebtoken';
 import FileType from 'file-type';
 import HttpErrors from 'http-errors';
@@ -7,6 +8,24 @@ import UploadTargetManager, { UploadTarget } from '../utils/UploadTargetManager'
 import { createGoneError, createConflictError } from '../utils/errors';
 
 const { JWT_SECRET } = process.env;
+
+const streamToBuffer = (stream: Stream): Promise<Buffer> => (
+  new Promise((resolve, reject) => {
+    const chunks: Uint8Array[] = [];
+
+    stream.on('data', (chunk) => {
+      chunks.push(chunk);
+    });
+
+    stream.on('end', () => {
+      resolve(Buffer.concat(chunks));
+    });
+
+    stream.on('error', (error) => {
+      reject(error);
+    });
+  })
+);
 
 const uploadTargetManager = new UploadTargetManager();
 
@@ -30,13 +49,18 @@ export default (diskManager: DiskManager) => async (req: Request, res: Response)
 
   const stream = await FileType.stream(req);
 
-  if (stream.fileType?.mime !== contentType) {
+  if (stream?.fileType?.mime !== contentType) {
     throw new HttpErrors.BadRequest('Incorrect file type.');
   }
 
   let path;
   try {
-    path = await diskManager.uploadFile(stream, { extension: stream.fileType?.ext });
+    path = await diskManager.uploadFile(
+      await streamToBuffer(stream),
+      {
+        extension: stream?.fileType?.ext,
+      },
+    );
   } catch (e) {
     throw createConflictError(req.path);
   }

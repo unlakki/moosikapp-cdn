@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import DiskManager from 'yadisk-mgr';
+import { DiskManager } from 'yadisk-mgr';
 import xml from 'xml';
 import filesize from 'filesize';
 import { createNotFoundError } from '../utils/errors';

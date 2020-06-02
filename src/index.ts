@@ -1,7 +1,7 @@
 import Express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
-import DiskManager from 'yadisk-mgr';
+import createDiskManager from 'yadisk-mgr';
 import HttpErrors from 'http-errors';
 import checkAuth from './middlewares/authorization';
 import checkPermissions from './middlewares/permissions';
@@ -14,7 +14,7 @@ import asyncErrorHandler, { withAsyncErrorHandler } from './middlewares/asyncErr
 const { PORT, TOKEN_LIST } = process.env;
 
 const tokenList = JSON.parse(String(TOKEN_LIST));
-const diskManager = new DiskManager(tokenList);
+const diskManager = createDiskManager(tokenList);
 
 const app = Express();
 
