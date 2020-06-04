@@ -21,18 +21,15 @@
     "url": "https://github.com/unlakki/moosikapp-cdn/issues"
   },
   "dependencies": {
+    "@types/request": "^2.48.5",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "file-type": "^14.1.2",
-    "filesize": "^6.0.1",
     "helmet": "^3.21.2",
     "http-errors": "^1.7.3",
     "jsonwebtoken": "^8.5.1",
-    "mime-types": "^2.1.26",
     "redis": "^2.8.0",
     "request": "^2.88.0",
-    "request-promise": "^4.2.4",
-    "xml": "^1.0.1",
     "yadisk-mgr": "https://github.com/unlakki/yadisk-mgr/releases/download/v2.5.12-beta/yadisk-mgr-v2.5.12.tgz"
   },
   "devDependencies": {
@@ -41,10 +38,7 @@
     "@types/helmet": "^0.0.44",
     "@types/http-errors": "^1.6.3",
     "@types/jsonwebtoken": "^8.3.5",
-    "@types/mime-types": "^2.1.0",
     "@types/redis": "^2.8.14",
-    "@types/request-promise": "^4.1.44",
-    "@types/xml": "^1.0.4",
     "@typescript-eslint/eslint-plugin": "^2.1.0",
     "@typescript-eslint/parser": "^2.1.0",
     "dotenv": "^8.0.0",
