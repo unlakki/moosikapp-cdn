@@ -28,7 +28,7 @@ export default (diskManager: DiskManager) => (
     await targetManager.add(target);
 
     try {
-      const path = await diskManager.uploadFile(req.file.buffer, { extension: req.file.ext });
+      const path = await diskManager.uploadFile(req.file.buffer, { ext: req.file.ext });
       res.status(201).header('Location', path).send();
     } catch (e) {
       throw new HttpErrors.Conflict();
