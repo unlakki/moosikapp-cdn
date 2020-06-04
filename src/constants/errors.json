@@ -1,6 +1,0 @@
-{
-  "FORBITTEN_ERROR": "Anonymous caller does not have storage.objects.{{type}} access to cdn.moosikapp{{path}}.",
-  "NOT_FOUND_ERROR": "Server can't find {{path}} object.",
-  "CONFLICT_ERROR": "Request {{path}} conflict with current state of the server.",
-  "GONE_ERROR": "Resource {{path}} is no longer available."
-}
