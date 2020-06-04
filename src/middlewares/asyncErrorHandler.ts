@@ -1,19 +1,20 @@
 import {
   RequestHandler, Request, Response, NextFunction,
 } from 'express';
-import { HttpError, InternalServerError } from 'http-errors';
-import XmlBuilder from '../utils/XmlBuilder';
+import { HttpError } from 'http-errors';
+
+const wrapper = (handler: RequestHandler) => (
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await handler(req, res, next);
+    } catch (e) {
+      next(e);
+    }
+  }
+);
 
 export const withAsyncErrorHandler = (...handlers: RequestHandler[]) => (
-  handlers.map((handler) => (
-    async (req: Request, res: Response, next: NextFunction) => {
-      try {
-        await handler(req, res, next);
-      } catch (e) {
-        next(e);
-      }
-    }
-  ))
+  handlers.map((handler) => wrapper(handler))
 );
 
 export default (error: Error, req: Request, res: Response, next: NextFunction) => {
@@ -23,12 +24,9 @@ export default (error: Error, req: Request, res: Response, next: NextFunction) =
   }
 
   if (error instanceof HttpError) {
-    res.status(error.status).type('xml').send(XmlBuilder.createErrorMessage(error));
+    res.status(error.status).send(error.message);
     return;
   }
 
-  const serverError = new InternalServerError(
-    'Server encountered an unexpected condition that prevented it from fulfilling the request.',
-  );
-  res.status(500).type('xml').send(XmlBuilder.createErrorMessage(serverError));
+  res.status(500).send('Internal Server Error');
 };
