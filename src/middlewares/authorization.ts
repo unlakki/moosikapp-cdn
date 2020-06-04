@@ -1,30 +1,30 @@
 import { Request, Response, NextFunction } from 'express';
 import JWT from 'jsonwebtoken';
-import { createForbittenError } from '../utils/errors';
+import HttpErrors from 'http-errors';
+import { jwtSecretKey } from '../config';
 
-const { JWT_SECRET } = process.env;
-
-interface AccessToken {
+interface UserAuth {
+  uuid: string;
   role: number;
 }
 
 export interface AuthorizedRequest extends Request {
-  jwt: AccessToken;
+  user: UserAuth;
 }
 
 export default () => (
   async (req: AuthorizedRequest, res: Response, next: NextFunction) => {
     const { authorization } = req.headers;
     if (!authorization || !authorization.startsWith('Bearer')) {
-      throw createForbittenError(req.path);
+      throw new HttpErrors.Forbidden();
     }
 
-    const token = authorization.slice(7);
+    const accessToken = authorization.slice(7);
 
     try {
-      req.jwt = <AccessToken>JWT.verify(token, String(JWT_SECRET));
+      req.user = <UserAuth>JWT.verify(accessToken, jwtSecretKey);
     } catch (e) {
-      throw createForbittenError(req.path);
+      throw new HttpErrors.Forbitten();
     }
 
     next();
