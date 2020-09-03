@@ -1,1 +1,1 @@
-# [CDN MoosikApp](https://moosikapp.tk)
+# [Moosik CDN](https://moosikapp.ml)
