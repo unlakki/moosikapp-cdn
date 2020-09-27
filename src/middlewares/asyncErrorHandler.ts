@@ -1,4 +1,4 @@
-import { RequestHandler, Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { HttpError } from 'http-errors';
 
 const handleAsyncError = (handler: RequestHandler) => async (
@@ -21,8 +21,6 @@ export default (error: any, req: Request, res: Response, next: NextFunction) => 
     next();
     return;
   }
-
-  console.log(error);
 
   if (error instanceof HttpError) {
     res.status(error.status).send(error.message);
