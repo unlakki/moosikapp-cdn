@@ -3,7 +3,6 @@
     "target": "ES6",
     "module": "CommonJS",
     "allowSyntheticDefaultImports": true,
-    "declaration": true,
     "esModuleInterop": true,
     "noImplicitAny": true,
     "strictNullChecks": true
