@@ -14,8 +14,9 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: ['prettier', '@typescript-eslint'],
-  plugins: [
-    '@typescript-eslint',
-  ],
-  rules: {},
+  rules: {
+    'no-underscore-dangle': ['error', {
+      allowAfterThis: true
+    }]
+  },
 };
