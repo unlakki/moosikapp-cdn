@@ -30,7 +30,7 @@
     "jsonwebtoken": "^8.5.1",
     "redis": "^2.8.0",
     "request": "^2.88.0",
-    "yadisk-mgr": "https://github.com/unlakki/yadisk-mgr/releases/download/v2.6.13/yadisk-mgr-v2.6.13.tgz"
+    "yadisk-mgr": "https://github.com/unlakki/yadisk-mgr/releases/download/v3.6.16/yadisk-mgr-v3.6.16.tgz"
   },
   "devDependencies": {
     "@types/cors": "^2.8.6",
