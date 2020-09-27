@@ -1,5 +1,4 @@
 const path = require('path');
-const webpack = require('webpack');
 const webpackNodeExternals = require('webpack-node-externals');
 const TerserPlugin = require('terser-webpack-plugin');
 
@@ -17,14 +16,12 @@ module.exports = {
     __dirname: true,
   },
   module: {
-    rules: [
-      {
-        test: /\.ts$/,
-        use: {
-          loader: 'ts-loader',
-        },
+    rules: [{
+      test: /\.ts$/,
+      use: {
+        loader: 'ts-loader',
       },
-    ],
+    }, ],
   },
   resolve: {
     extensions: ['.ts'],
@@ -33,10 +30,9 @@ module.exports = {
     webpackNodeExternals(),
   ],
   devtool: isProd ? false : 'source-map',
-  plugins: [
-    new webpack.optimize.ModuleConcatenationPlugin(),
-  ],
+  plugins: [],
   optimization: {
+    concatenateModules: true,
     minimize: true,
     minimizer: [
       new TerserPlugin(),
