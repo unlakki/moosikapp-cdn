@@ -24,7 +24,6 @@ class ConfigProvider {
     if (diskTokenIds.length === 0) {
       throw new Error('No disk token');
     }
-
     this._diskTokenList = diskTokenIds.map((diskTokenId) => <string>process.env[diskTokenId]);
 
     const port = process.env.PORT;
